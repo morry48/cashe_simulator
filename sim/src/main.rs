@@ -151,16 +151,22 @@ pub fn main() {
             }
             'M' => {
                 let (hit, eviction) = cache.access(set_index, tag, &mut time);
-                if !hit {
+                if hit {
+                    // Modify操作がヒットした場合、ロードとストアの両方でヒットするため、hitsを2回増やす
+                    hits += 2;
+                    if verbose {
+                        println!("{} {},{} hit hit", operation, address_str, size);
+                    }
+                } else {
+                    // Modify操作がミスした場合、最初はミス、その後の書き込みでヒット
                     misses += 1;
                     if eviction {
                         evictions += 1;
                     }
-                }
-                // M operation is considered as one miss (if it was a miss) and one hit.
-                hits += 1;
-                if verbose {
-                    println!("{} {},{} {}{}", operation, address_str, size, if hit { "hit " } else { "miss " }, if hit { "hit" } else { if eviction { "eviction hit" } else { "hit" } });
+                    hits += 1; // 書き込みでヒット
+                    if verbose {
+                        println!("{} {},{} miss{} hit", operation, address_str, size, if eviction { " eviction" } else { "" });
+                    }
                 }
             }
             _ => {}
