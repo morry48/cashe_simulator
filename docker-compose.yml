@@ -1,0 +1,10 @@
+services:
+  rust:
+    build: .
+    tty: true
+    volumes:
+      - ../coursework-morry48:/coursework-morry48
+    working_dir: /coursework-morry48/sim
+    environment:
+      - USER=user
+
