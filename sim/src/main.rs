@@ -129,6 +129,7 @@ pub fn main() {
         let address = usize::from_str_radix(&address_str, 16).unwrap();
         let set_index = (address >> b) & ((1 << s) - 1);
         let tag = address >> (s + b);
+        let size = parts[1].split(',').last().unwrap();
 
         match operation {
             'L' | 'S' => {
@@ -136,7 +137,7 @@ pub fn main() {
                 if hit {
                     hits += 1;
                     if verbose {
-                        println!("{} {} hit", operation, address_str);
+                        println!("{} {},{} hit", operation, address_str, size);
                     }
                 } else {
                     misses += 1;
@@ -144,7 +145,7 @@ pub fn main() {
                         evictions += 1;
                     }
                     if verbose {
-                        println!("{} {} miss{}", operation, address_str, if eviction { " eviction" } else { "" });
+                        println!("{} {},{} miss{}", operation, address_str, size, if eviction { " eviction" } else { "" });
                     }
                 }
             }
@@ -159,7 +160,7 @@ pub fn main() {
                 // M operation is considered as one miss (if it was a miss) and one hit.
                 hits += 1;
                 if verbose {
-                    println!("{} {} {}{}", operation, address_str, if hit { "hit " } else { "miss " }, if hit { "hit" } else { if eviction { "eviction hit" } else { "hit" } });
+                    println!("{} {},{} {}{}", operation, address_str, size, if hit { "hit " } else { "miss " }, if hit { "hit" } else { if eviction { "eviction hit" } else { "hit" } });
                 }
             }
             _ => {}
