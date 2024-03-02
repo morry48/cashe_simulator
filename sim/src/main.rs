@@ -114,7 +114,8 @@ pub fn main() {
     let mut misses = 0;
     let mut evictions = 0;
 
-    let file = File::open(trace_file).unwrap();
+    let adjusted_trace_file = format!("../{}", trace_file);
+    let file = File::open(adjusted_trace_file).unwrap();
     let reader = BufReader::new(file);
 
     for line in reader.lines() {
