@@ -78,7 +78,7 @@ pub fn main() {
         match result {
             Ok(opt) => match opt {
                 getopt::Opt('h', _) => {
-                    println!("Usage: ./sim [-hv] -s <s> -E <E> -b <b> -t <tracefile>");
+                    println!("Usage: ./sim-exe [-hv] -s <s> -E <E> -b <b> -t <tracefile>");
                     return;
                 },
                 getopt::Opt('v', _) => {
@@ -125,7 +125,11 @@ pub fn main() {
 
         let parts: Vec<&str> = line.split_whitespace().collect();
         let operation = parts[0].chars().next().unwrap();
-        let address_str = parts[1].split(',').next().unwrap();
+        let mut address_str = parts[1].split(',').next().unwrap();
+        // [todo] should conform whether I should trim prefix "0"
+        if address_str != "0" {
+            address_str = address_str.trim_start_matches("0");
+        }
         let address = usize::from_str_radix(&address_str, 16).unwrap();
         let set_index = (address >> b) & ((1 << s) - 1);
         let tag = address >> (s + b);
@@ -137,7 +141,7 @@ pub fn main() {
                 if hit {
                     hits += 1;
                     if verbose {
-                        println!("{} {},{} hit", operation, address_str, size);
+                        println!("{} {},{} hit ", operation, address_str, size);
                     }
                 } else {
                     misses += 1;
@@ -145,7 +149,7 @@ pub fn main() {
                         evictions += 1;
                     }
                     if verbose {
-                        println!("{} {},{} miss{}", operation, address_str, size, if eviction { " eviction" } else { "" });
+                        println!("{} {},{} miss{} ", operation, address_str, size, if eviction { " eviction" } else { "" });
                     }
                 }
             }
@@ -155,7 +159,7 @@ pub fn main() {
                     // Modify操作がヒットした場合、ロードとストアの両方でヒットするため、hitsを2回増やす
                     hits += 2;
                     if verbose {
-                        println!("{} {},{} hit hit", operation, address_str, size);
+                        println!("{} {},{} hit hit ", operation, address_str, size);
                     }
                 } else {
                     // Modify操作がミスした場合、最初はミス、その後の書き込みでヒット
@@ -165,7 +169,7 @@ pub fn main() {
                     }
                     hits += 1; // 書き込みでヒット
                     if verbose {
-                        println!("{} {},{} miss{} hit", operation, address_str, size, if eviction { " eviction" } else { "" });
+                        println!("{} {},{} miss{} hit ", operation, address_str, size, if eviction { " eviction" } else { "" });
                     }
                 }
             }
